@@ -1,0 +1,353 @@
+---
+title: "C7091 Assessment Mini Project"
+author: "Maria Wilson"
+format: html
+editor: visual
+---
+
+## [**Introduction**]{.underline}
+
+This report aimed to establish whether a new nanotechnology was successful in increasing the yield of soya beans by attracting more nitrogen-fixing bacteria to soil, and if so whether it was more effective than an existing biological nitrogen fixing (BNF) inoculant.
+
+To answer these questions, we were provided with data from trials which took place across 2 years (2016-2017) on 60 plots of land with three different soil groups:\
+Group 1: A control group containing 20 plots with no nanotechnology or BNF treatment.\
+Group 2: 20 plots with the nanotechnology applied once in 2016.\
+Group 3: 20 plots with bacterial inoculant applied.
+
+The plots were randomised once, and the nanotechnology was only applied once. This was to establish whether the nanotechnology was more effective in the second year than the first. An issue with the data received, was that it was not stated whether the BNF inoculant was applied only once, or whether it was applied in 2017 as well.
+
+The success of each land plot within each group was measured by the yield count per plot of land. The yield increase from 2016 to 2017 was calculated by subtracting each yield count in 2017 from that of the corresponding land plot in 2016. An analysis of variance (ANOVA) was performed on the data and the p-values were compared to an alpha-value of 0.05 to determine whether the changes in yield for the nanotechnology were significantly different enough to the other groups.
+
+This showed a significant difference in the yield means between the groups in 2016 (p = 0.0015) and in 2017 (p = 6.3-14). Post-hoc tests further showed that the group which was statistically different, when compared to the others, was the nanotechnology. In 2016, when compared to the biological inoculant (p = 0.0016) and with the control (p = 0.0232). In 2017, p \< 0.0001 for both comparisons. However, the data showed a decrease in yield in all groups from 2016 to 2017 as opposed to the predicted increase for nanotechnology. The ANOVA did not find this to be statistically significant (p = 0.416) so this was inconclusive.
+
+## [**Background**]{.underline}
+
+[Context]{.underline}
+
+Over the past 100 years, intensive farming has depleted the soil of many nutrients required by crops to grow successfully. Nitrogen is essential for all plants to build the proteins they need to grow and in an agricultural setting, to produce higher yields. However, it needs to be converted into nitrates, a form which the plants can absorb. Rhizobia are bacteria in the soil that carry out a process of biological nitrogen-fixing (BNF) which converts atmospheric nitrogen into nitrates. Such bacteria form symbiotic relationships with plants in the legume family which includes soya beans, by attaching themselves to the roots of the plants and creating nodules. They then receive carbon from the plant in exchange for the newly fixed nitrogen they provide it.
+
+In an agricultural setting, there are soil treatments known as BNF inoculants that are used to increase crop yields.
+
+The new treatment being tested is a nanotechnology. It was designed to encourage the expression of certain genes in rhizobia which would increase their sensitivity to specific exudates released by the soya beans. If successful, more of the nitrogen-fixing microorganisms would carry out the BNF process at an earlier stage of crop growth, therefore increasing the availability of nitrogen for the soya bean plants to absorb from an early stage of growth. By increasing the yield of the crop, more exudates should be released into the soil, encouraging the same gene expression in the bacteria in subsequent harvests. Therefore, only one application of the nanotechnology would be needed to secure higher yields for subsequent years.
+
+[Data Collection]{.underline}
+
+Soya beans were planted in 60 plots of land. To determine whether the nanotechnology worked, it was important to compare its effect with that of a regular BNF inoculant, and to include a control group which did not contain any form of soil treatment. Therefore, Group 1 of 20 plots contained the nanotechnology, Group 2 of 20 plots had BNF inoculant and Group 3 consisted of the final 20 which were untreated. The plots were randomised in 2016 to avoid bias. Results were taken 5 times each year, measured by the total yield per plot. This led to a total of 100 readings per soil type per year.
+
+[Hypotheses]{.underline}
+
+There were three hypotheses (A, B and C) to answer three research questions.
+
+Null Hypothesis A (H0 A): All soil groups produce a similar mean yield in both years.\
+Alternative Hypothesis A (H1 A) The mean yield will be significantly higher in Group 1 than in other groups in both testing years.
+
+Null Hypothesis B (H0 B): The mean yield for Group 1 will be the same in both years.\
+Alternative Hypothesis B (H1 B): The mean yield for Group 1 will be significantly higher in 2017.
+
+Null Hypothesis C (H0): The mean yield will be similar in Group 2 and 3.\
+Alternative Hypothesis C (H1): The mean yield in the Group 2 will be significantly higher than that of Group 3.
+
+## [**Materials and Methods**]{.underline}
+
+[Materials]{.underline}
+
+The data was collected by the biotechnology company. The analysis took place on R Studio and used the tidyverse, dplyr and emmeans packages. The ggplot2 package was also used to create visualisations for the results.
+
+[Methods]{.underline}
+
+First, the mean yield was calculated for each soil group per year with the following code:
+
+```{r}
+#### HEADER ####
+## Who: Maria Wilson
+## What: R Mini Project
+## When: 2024-10-11
+
+
+## CONTENTS ####
+## 00 Setup
+## 1.0 Exploratory Data Analysis
+## 2.0 Hypothesis A
+## 3.0 Hypothesis B
+## 4.0 Graphs
+
+
+
+## 00 Setup ####
+
+# Set working directory
+setwd("C:\\Users\\masha\\Documents\\C7091\\Assessment")
+
+# Load libraries
+library(tidyverse)
+library(dplyr)
+library(emmeans)
+
+# Load data
+raw_data <- read.csv('data.csv')
+
+
+## 1.0 Exploratory Data Analysis ####
+
+
+## 1.1 Mean yield for each soil
+# Separate each soil variable.
+nanotechnology <- raw_data %>%                   # select data object: project_data
+  filter(soil == 'nanotechnology')               # filter for nanotechnology
+
+bnf <- raw_data %>%                          # select data object: project_data
+  filter(soil == 'bacterial_inoculant')          # filter for bacterial inoculant
+  
+control <- raw_data %>%                      # select data object: project_data
+  filter(soil == 'control')                      # filter for control
+
+# Calculate the mean Yield for each soil group over the full 2 years.
+
+mean(control$Yield)               # Mean yield of control group
+# 45.56
+mean(nanotechnology$Yield)        # Mean yield of nanotechnology group
+# 59.24
+mean(bnf$Yield)                   # Mean yield of bnf group
+# NA
+summary(bnf) # There is one NA value in the data for bnf yield
+mean(na.omit(bnf$Yield))          # Mean yield of bnf group, omitting the NA value.
+# 44.46
+
+# The mean yield for nanotechnology is higher than the other groups. However, this is very vague. Next step is to calculate the mean for each group, for each year.
+
+
+
+
+## 1.2 Mean yield for each soil group for per year
+nano_2016 <- nanotechnology %>%         # Select data object: nanotechnology
+  filter(yr == 2016)                    # Filter by year 2016
+nano_2017 <- nanotechnology %>%         # Select data object: nanotechnology
+  filter(yr == 2017)                    # Filter by year 2017
+
+bnf_2016 <- bnf %>%                     # Select data object: bnf
+  filter(yr == 2016)                    # Filter by year 2016
+bnf_2017 <- bnf %>%                     # Select data object: bnf
+  filter(yr == 2017)                    # Filter by year 2017
+
+control_2016 <- control %>%             # Select data object: control
+  filter(yr == 2016)                    # Filter by year 2016
+control_2017 <- control %>%             # Select data object: control
+  filter(yr == 2017)                    # Filter by year 2017
+
+
+# Caluclate 2016 yield means
+mean(control_2016$Yield)       # Mean yield for control group in 2016
+# 59. 55
+mean(nano_2016$Yield)          # Mean yield for nanotechnology in 2016
+# 70. 29
+mean(bnf_2016$Yield)           # Mean yield for bnf in 2016
+# NA
+mean(na.omit(bnf_2016$Yield))  # Mean yield for bnf in 2016, omitting the NA value
+# 56.07
+
+# Calculate 2017 yield means
+mean(control_2017$Yield)       # Mean yield for control group in 2017
+# 31.57
+mean(nano_2017$Yield)          # Mean yield for nanotechnology group in 2017
+# 48.19
+mean(bnf_2017$Yield)           # Mean yield for bnf in 2017
+# 32.97
+
+
+# The mean yield for the nanotechnology was higher than the other two groups, in both 2016 and 2017.
+# In 2016 it was 70.29, compared to 59.55 for the control group, and 56.07 for the bnf inoculant.
+# It was surprising that the bnf inoculant produced a lower mean yield than the untreated group.
+# In 2017, the nanotechnology mean yield was 48.19.
+# This was higher than 31.57 for the control group, and 32.97 for the bnf group.
+# This time, the bnf inoculand produced a slightly higher yield than the control group.
+
+```
+
+The following table shows the results for 2016 in descending order:
+
+| Soil Group                    | Mean Yield in 2016 |
+|-------------------------------|--------------------|
+| Group 2 (Nanotechnology       | 70.29              |
+| Group 1 (Control)             | 59.55              |
+| Group 3 (Biological Inoculant | 56.07              |
+
+It is worth noting that there was a missing value in the BNF data, but the sample size was still large enough to continue with the calculation. There were two stand out features of the means. The first was that the Group 2 did produce the highest mean yield. The second was that Group 1 had a slightly higher yield than Group 3, which was unexpected.
+
+The means for 2017 in descending order:
+
+| Soil Group                     | Mean Yield in 2017 |
+|--------------------------------|--------------------|
+| Group 2 (Nanotechnology)       | 48.19              |
+| Group 3 (Biological Inoculant) | 32.97              |
+| Group 1 (Control)              | 31.57              |
+
+Once again, the nanotechnology produced the highest mean yield. This time, Group 3 was marginally higher than Group 1.
+
+The next step in analysing the data was to determine whether the differences in means between each group were statistically significant enough to accept any of the alternative hypotheses. To do this, an analysis of variance (ANOVA) was conducted. Firstly, the following assumptions were made on the data:
+
+We assumed the sample size was large enough for a Gaussian distribution to exist in the data within each group. Secondly, we assumed homoscedasticity in the data, meaning that the variance in yield was similar in all 3 groups. Thirdly, we assumed the observations were independent.
+
+The p-value calculated from the ANOVAs were compared to the alpha-value of 0.05 when deciding to accept or reject the null hypothesis. If P \< 0.05, the results were considered to be statistically significant enough to reject the null hypothesis and accept the alternative.
+
+```{r}
+## 2.0 Hypothesis A ####
+
+# 2.1 ANOVA 
+# To determine whether the differences in mean outlined above were statistically significant, an ANOVA was performed.
+
+
+data_2016 <- raw_data %>%             # Create new object and select original dataframe
+  filter(yr == 2016)                  # Filter by year 2016
+
+anova_16 <- aov(Yield ~ soil, data = data_2016)     # Run anova on data in 2016
+
+
+data_2017 <- raw_data %>%         # Create object and select original data
+  filter(yr == 2017)                  # Filter by year 2017
+
+
+anova_17 <- aov(Yield ~ soil, data = data_2017)    # Run anova n data in 2017
+
+summary(anova_16)    # Summary of anova results.
+# F value is 6.65
+# P value is 0.0015
+
+# P value < 0.05. Can reject null hypothesis
+
+summary(anova_17)        # Summary of anova results
+# F value is 33.73
+# P value is 6.3e-14
+
+# P value <  0.05. Reject null hypothesis, accept alternative hypothesis
+
+
+## 2.2 Post-hoc
+posthoc_16 <- emmeans(anova_16, pairwise ~ soil)
+summary(posthoc_16)
+
+#  contrast                             estimate   SE  df t.ratio p.value
+#  bacterial_inoculant - control           -3.47 4.07 296  -0.854  0.6699
+#  bacterial_inoculant - nanotechnology   -14.22 4.07 296  -3.494  0.0016
+#  control - nanotechnology               -10.75 4.06 296  -2.647  0.0232
+
+posthoc_17 <- emmeans(anova_17, pairwise ~ soil)
+summary(posthoc_17)
+
+#  contrast                             estimate   SE  df t.ratio p.value
+# bacterial_inoculant - control             1.4 2.25 297   0.624  0.8071
+# bacterial_inoculant - nanotechnology    -15.2 2.25 297  -6.781  <.0001
+# control - nanotechnology                -16.6 2.25 297  -7.404  <.0001
+
+```
+
+For Hypotheis B, The mutate() function, from the dplyr R package was used to create a new variable to perform the analysis on. The variable was named ‘Yield Increase’, and was calculated by subtracting each yield count for 2017 from its corresponding reading for the same plot in 2016. The calculations were done using the following code:
+
+```{r}
+## 3.0 HYPOTHESIS B ####
+
+years_data <- data.frame(data_2016, data_2017)   # combine data for each year
+
+years_data <- years_data %>% 
+  rename(Yield_2016 = Yield,           # Rename Yield to Yield 2016
+         Yield_2017 = Yield.1)         # Rename Yield.1 to Yield 2017
+
+
+yield_increase <- years_data %>% 
+  mutate(yield_increase = Yield_2017 - Yield_2016)           # create new column with increase in yield
+
+yield_increase <- yield_increase %>% 
+  select(soil, yield_increase)                               # select the columns needed
+
+
+
+nano_inc <- yield_increase %>%                              
+  select(soil, yield_increase) %>% 
+  filter(soil == 'nanotechnology')
+
+control_inc <- yield_increase %>% 
+  select(soil, yield_increase) %>% 
+  filter(soil == 'control')
+
+bnf_inc <- yield_increase %>% 
+  select(soil, yield_increase) %>% 
+  filter(soil == 'bacterial_inoculant')
+
+summary(nano_inc)    # Show summary statistics
+
+# The summary shows that the mean increase in yield from 2016 to 2017, for the nanotechnology is a negative number.
+# This means that the mean yield actually decreased.
+
+yield_increase_all <- data.frame(control_inc$yield_increase, nano_inc$yield_increase, bnf_inc$yield_increase)
+
+# Run anova on yield increase
+inc_anova <- aov(yield_increase ~ soil, data = yield_increase)
+summary(inc_anova)
+
+# F value = 0.879
+# P value = 0.416
+# P value > 0.05, accept null hypothesis.
+
+
+## 3.2 Post-hoc
+
+posthoc_b <- emmeans(inc_anova, pairwise ~ soil)
+summary(posthoc_b)
+```
+
+## [**Results and Discussion**]{.underline}
+
+Hypothesis A
+
+There was a significant difference in the mean crop yield between at least some soil types in 2016 (*F*(2, 296) = \[6.65\], *p* = 0.0015) and in 2017 (*F(*2, 297) = \[33.73\], *p* = 6.3e-14). In both cases *p* \< 0.05.
+
+The emmeans() package was used to perform a post hoc test (Tukey’s HSD test) which confirmed that it was Group 1 (nanotechnology) which had a significantly higher mean yield than both of the other groups. The resulting *p* Values are below, with nanotechnology in bold.
+
+For 2016:
+
+Group 3, Group 1 or bacterial inoculant, control (*p* = 0.6699) 
+
+**Group 3, Group 2 or bacterial inoculant, nanotechnolog (*p* = 0.0016)**
+
+**Group 1, Group 2 or control vs nanotechnology ( *p* = 0.0232)**
+
+This showed that the plots with nanotechnology had a significantly higher mean yield than the other plots.
+
+2017:
+
+Group 3, Group 1 or bacterial inoculant, control (*p* = 0.8071)
+
+**Group 3, Group 2 or bacterial inoculant, nanotechnology (*p* \< 0.0001)**
+
+**Group 1, Group 2, control, nanotechnology (*p* \< 0.0001)**
+
+It should be noted that there were some outliers in the data. In 2016, these were for the control group and the bacterial inoculant group. However, due to them being outliers above their respective means, it would not have affected the hypothesis. *p* \< 0.05 consistently for the nanotechnology, therefore we can reject H0 and accept H1. The nanotechnology achieved a higher mean yield than the bacterial inoculant and the control group, in 2016 and 2017.
+
+![Fig 1: Boxplot showing the crop yield in the plots in 2016 for each soil group. Group 1 = Control Group, Group 2 = Nanotechnology, Group 3 = bacterial inoculant.](boxplot16.jpeg){fig-align="center"}
+
+![Fig 2: Boxplot showing the crop yield in the plots in 2017 for each soil group. Group 1 = Control Group, Group 2 = Nanotechnology, Group 3 = bacterial inoculant.](boxplot17.jpeg){fig-align="center"}
+
+[Hypothesis B]{.underline}
+
+There was no significant difference found between the mean yield increase between any of the groups (*F*(2, 296) = 0.879, *p* = 0.416).
+
+We accepted the H0 and rejected H1. This means that any increase/decrease in mean yield from 2016 to 2017 was similar in all groups. The nanotechnology did not produce a significantly higher crop yield in 2017 than in 2016, nor was the decrease significant.
+
+[Hypothesis C]{.underline}
+
+These results, taken from the post-hoc test carried out for Hypothesis A were applicable.
+
+2016:
+
+Group 3, Group 1 or bacterial inoculant vs control (*p* = 0.6699)
+
+2017:
+
+Group 3, Group 1 bacterial inoculant vs control (*p* = 0.8071)
+
+In both years *p* \> 0.05 we accepted the null hypothesis H0 and rejected the alternative hypothesis H1.
+
+## [**Conclusions**]{.underline}
+
+The results of the ANOVAs showed that the mean yield for the nanotechnology crops was significantly higher than that of the bacterial inoculant and the control group, in both years. Therefore, we can conclude that the nanotechnology was successful at this early stage.
+
+However, the results for Hypothesis B were inconclusive. The yield decreased for all 3 groups being tested which could have been due to factors outside of the data (e.g. temperature, rainfall, disease etc). It is our suggestion that the tests are repeated.
